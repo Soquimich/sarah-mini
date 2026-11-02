@@ -71,17 +71,26 @@ def list_checkins():
             detail="Base de datos no disponible",
         )
 
-@app.post("/checkins", status_code=201)
-def create_checkin(checkin: CheckInCreate):
+@app.get("/checkins")
+def list_checkins(mood: str | None = None, activity: str | None = None):
     try:
         with get_connection() as conn:
-            row = conn.execute(
-                """INSERT INTO checkins (mood, activity, note)
-                   VALUES (%s, %s, %s)
-                   RETURNING id, mood, activity, note""",
-                (checkin.mood, checkin.activity, checkin.note),
-            ).fetchone()
-            return row
+            # Iniciamos una consulta base
+            query = "SELECT id, mood, activity, note FROM checkins WHERE 1=1"
+            params = []
+            
+            # Agregamos filtros dinámicamente si el usuario los envía
+            if mood:
+                query += " AND mood = %s"
+                params.append(mood)
+            if activity:
+                query += " AND activity = %s"
+                params.append(activity)
+                
+            query += " ORDER BY id"
+            
+            rows = conn.execute(query, params).fetchall()
+            return rows
     except psycopg.OperationalError:
         raise HTTPException(
             status_code=503,
