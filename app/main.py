@@ -58,20 +58,6 @@ def health():
     return {"status": "ok"}
 
 @app.get("/checkins")
-def list_checkins():
-    try:
-        with get_connection() as conn:
-            rows = conn.execute(
-                "SELECT id, mood, activity, note FROM checkins ORDER BY id"
-            ).fetchall()
-            return rows
-    except psycopg.OperationalError:
-        raise HTTPException(
-            status_code=503,
-            detail="Base de datos no disponible",
-        )
-
-@app.get("/checkins")
 def list_checkins(mood: str | None = None, activity: str | None = None):
     try:
         with get_connection() as conn:
