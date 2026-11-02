@@ -78,7 +78,7 @@ def list_checkins(mood: str | None = None, activity: str | None = None):
             # Iniciamos una consulta base
             query = "SELECT id, mood, activity, note FROM checkins WHERE 1=1"
             params = []
-            
+
             # Agregamos filtros dinámicamente si el usuario los envía
             if mood:
                 query += " AND mood = %s"
@@ -86,9 +86,9 @@ def list_checkins(mood: str | None = None, activity: str | None = None):
             if activity:
                 query += " AND activity = %s"
                 params.append(activity)
-                
+
             query += " ORDER BY id"
-            
+
             rows = conn.execute(query, params).fetchall()
             return rows
     except psycopg.OperationalError:
